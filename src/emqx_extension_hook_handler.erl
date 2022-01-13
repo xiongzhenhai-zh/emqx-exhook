@@ -46,7 +46,6 @@
 -export([ on_message_publish/1
         , on_message_delivered/2
         , on_message_acked/2
-        , on_message_dropped/2
         ]).
 
 %% Utils
@@ -80,7 +79,6 @@
          , {'message.publish',     {?MODULE, on_message_publish,      []}}
          , {'message.delivered',   {?MODULE, on_message_delivered,    []}}
          , {'message.acked',       {?MODULE, on_message_acked,        []}}
-         , {'message.dropped',     {?MODULE, on_message_dropped,      []}}
          ]).
 
 %%--------------------------------------------------------------------
@@ -165,9 +163,6 @@ on_message_delivered(ClientInfo, Message)->
 
 on_message_acked(ClientInfo, Message)->
     cast('message_acked',[clientinfo(ClientInfo), message(Message)]).
-
-on_message_dropped(Message, Reason)->
-    cast('message_dropped',[message(Message), stringfy(Reason)]).
 
 %%--------------------------------------------------------------------
 %% Types
