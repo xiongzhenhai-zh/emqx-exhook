@@ -45,7 +45,7 @@
 %% Message  Hooks
 -export([ on_message_publish/1
         , on_message_delivered/2
-        , on_message_acked/1
+        , on_message_acked/2
         , on_message_dropped/2
         ]).
 
