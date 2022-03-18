@@ -104,7 +104,7 @@ unload() ->
     emqx:unhook('session.resumed',     {?MODULE, on_session_resumed}),
     emqx:unhook('session.discarded',   {?MODULE, on_session_discarded}),
     emqx:unhook('session.takeovered',  {?MODULE, on_session_takeovered}),
-    emqx:unhook('session.terminated',  {?MODULE, on_session_terminated})
+    emqx:unhook('session.terminated',  {?MODULE, on_session_terminated}),
     emqx:unhook('message.publish',     {?MODULE, on_message_publish}),
     emqx:unhook('message.delivered',   {?MODULE, on_message_delivered}),
     emqx:unhook('message.acked',       {?MODULE, on_message_acked}),
