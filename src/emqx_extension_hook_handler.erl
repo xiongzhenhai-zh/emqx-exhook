@@ -46,6 +46,13 @@
         , on_session_terminated/3
         ]).
 
+%% Message  Hooks
+-export([ on_message_publish/1
+        , on_message_delivered/2
+        , on_message_acked/1
+        , on_message_dropped/2
+        ]).
+
 -import(emqx_extension_hook,
         [ cast/2
         , call_fold/4
@@ -76,7 +83,11 @@ load() ->
     emqx:hook('session.resumed',     {?MODULE, on_session_resumed,      []}),
     emqx:hook('session.discarded',   {?MODULE, on_session_discarded,    []}),
     emqx:hook('session.takeovered',  {?MODULE, on_session_takeovered,   []}),
-    emqx:hook('session.terminated',  {?MODULE, on_session_terminated,   []}).
+    emqx:hook('session.terminated',  {?MODULE, on_session_terminated,   []}),
+    emqx:hook('message.publish',     {?MODULE, on_message_publish,      []}),
+    emqx:hook('message.delivered',   {?MODULE, on_message_delivered,    []}),
+    emqx:hook('message.acked',       {?MODULE, on_message_acked,        []}),
+    emqx:hook('message.dropped',     {?MODULE, on_message_dropped,      []}).
 
 unload() ->
     emqx:unhook('client.connect',      {?MODULE, on_client_connect}),
@@ -93,7 +104,11 @@ unload() ->
     emqx:unhook('session.resumed',     {?MODULE, on_session_resumed}),
     emqx:unhook('session.discarded',   {?MODULE, on_session_discarded}),
     emqx:unhook('session.takeovered',  {?MODULE, on_session_takeovered}),
-    emqx:unhook('session.terminated',  {?MODULE, on_session_terminated}).
+    emqx:unhook('session.terminated',  {?MODULE, on_session_terminated})
+    emqx:unhook('message.publish',     {?MODULE, on_message_publish}),
+    emqx:unhook('message.delivered',   {?MODULE, on_message_delivered}),
+    emqx:unhook('message.acked',       {?MODULE, on_message_acked}),
+    emqx:unhook('message.dropped',     {?MODULE, on_message_dropped}).
 
 %%--------------------------------------------------------------------
 %% Clients
@@ -164,6 +179,23 @@ on_session_takeovered(ClientInfo, _SessInfo) ->
 
 on_session_terminated(ClientInfo, Reason, _SessInfo) ->
     cast('session_terminated', [clientinfo(ClientInfo), stringfy(Reason)]).
+
+%%--------------------------------------------------------------------
+%% Message
+%%--------------------------------------------------------------------
+
+on_message_publish(Message)->
+    cast('message_publish',[message(Message)]).
+
+on_message_delivered(ClientInfo, Message)->
+    cast('message_delivered',[clientinfo(ClientInfo), message(Message)]).
+
+on_message_acked(ClientInfo, Message)->
+    cast('message_acked',[clientinfo(ClientInfo), message(Message)]).
+
+on_message_dropped(Message, Reason)->
+    cast('message_dropped',[message(Message), stringfy(Reason)]).
+
 
 %%--------------------------------------------------------------------
 %% Types
